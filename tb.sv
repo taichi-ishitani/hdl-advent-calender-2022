@@ -61,6 +61,7 @@ module tb;
     $finish;
   end
 
+`ifdef  ROUND_ROBIN
   round_robin #(
     .REQUEST_WIDTH  (8  )
   ) duv (
@@ -69,4 +70,24 @@ module tb;
     .i_request  (request  ),
     .o_grant    (grant    )
   );
+`elsif PRIORITIZED_ROUND_ROBIN
+  logic [7:0][1:0]  priority_value;
+
+  always_comb begin
+    for (int i = 0;i < 8;++i) begin
+      priority_value[i] = i % 4;
+    end
+  end
+
+  prioritized_round_robin #(
+    .REQUEST_WIDTH  (8  ),
+    .PRIORITY_WIDTH (2  )
+  ) duv (
+    .i_clk      (clk            ),
+    .i_rst_n    (rst_n          ),
+    .i_priority (priority_value ),
+    .i_request  (request        ),
+    .o_grant    (grant          )
+  );
+`endif
 endmodule
