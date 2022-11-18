@@ -17,7 +17,7 @@ module tb;
   end
 
   logic [7:0]       request;
-  logic [2:0]       grant;
+  logic [7:0]       grant;
   logic [15:0]      request_count;
   logic [7:0][15:0] grant_count;
 
@@ -27,7 +27,7 @@ module tb;
         request[i]  <= '0;
       end
       else if (grant_count[i] < 64) begin
-        if (request[i] && (grant == i)) begin
+        if (grant[i]) begin
           request[i]  <= '0;
         end
         else if ((!request[i]) && ($urandom_range(0, 2) == 2)) begin
@@ -45,7 +45,7 @@ module tb;
     else if (request != '0) begin
       request_count <= request_count + 1;
       for (int i = 0;i < 8;++i) begin
-        if (request[i] && (grant == i)) begin
+        if (grant[i]) begin
           grant_count[i]  <= grant_count[i] + 1;
           break;
         end
