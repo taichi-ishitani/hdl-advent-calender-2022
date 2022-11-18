@@ -61,16 +61,7 @@ module tb;
     $finish;
   end
 
-`ifdef  ROUND_ROBIN
-  round_robin #(
-    .REQUEST_WIDTH  (8  )
-  ) duv (
-    .i_clk      (clk      ),
-    .i_rst_n    (rst_n    ),
-    .i_request  (request  ),
-    .o_grant    (grant    )
-  );
-`elsif PRIORITIZED_ROUND_ROBIN
+`ifdef PRIORITIZED_ROUND_ROBIN
   logic [7:0][1:0]  priority_value;
 
   always_comb begin
@@ -88,6 +79,28 @@ module tb;
     .i_priority (priority_value ),
     .i_request  (request        ),
     .o_grant    (grant          )
+  );
+`elsif WEIGTED_ROUND_ROBIN
+  localparam  [7:0][3:0]  WEIGHT  = '{8, 7, 6, 5, 4, 3, 2, 1};
+
+  weighted_round_robin #(
+    .REQUEST_WIDTH  (8      ),
+    .WEIGHT_WIDTH   (4      ),
+    .WEIGHT         (WEIGHT )
+  ) duv (
+    .i_clk      (clk      ),
+    .i_rst_n    (rst_n    ),
+    .i_request  (request  ),
+    .o_grant    (grant    )
+  );
+`else
+  round_robin #(
+    .REQUEST_WIDTH  (8  )
+  ) duv (
+    .i_clk      (clk      ),
+    .i_rst_n    (rst_n    ),
+    .i_request  (request  ),
+    .o_grant    (grant    )
   );
 `endif
 endmodule
